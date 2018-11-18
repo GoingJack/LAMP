@@ -1,0 +1,43 @@
+Linux 安装 jpeg-6b 错误 ./libtool 命令未找到博客分类： LinuxLinuxGCCCC++C# 
+
+问题描述：
+
+[root@bogon jpeg-6b]# make; make install
+./libtool --mode=compile gcc -O2  -I. -c ./jcapimin.c
+make: ./libtool：命令未找到
+make: *** [jcapimin.lo] 错误 127
+./libtool --mode=compile gcc -O2  -I. -c ./cjpeg.c
+make: ./libtool：命令未找到
+make: *** [cjpeg.lo] 错误 127
+解决办法：
+
+首先看有没有安装libtool 及 libtool-ltdl-devel
+rpm   -qa | grep   libtool
+然后进入jpeg-6b的源码目录，然后执行以下步骤，切记！COPY到当前目录注意后面的点(.)
+
+cp   /usr/share/libtool/config/config.sub  .
+cp   /usr/share/libtool/config/config.guess  .
+
+也就是把 libtool里面的两个配置文件拿来覆盖掉jpeg-6b目录下的对应文件
+make clean 再重新configure
+没有权限的时候先建立对应的文件夹，再次make install就行了
+getconf LONG_BIT
+可以查看系统的位数 32 / 64 
+
+
+
+
+
+
+在编译gd库make步骤时出现
+/usr/bin/ld: /usr/local/lib/libz.a(compress.o): relocation R_X86_64_32
+against `a local symbol' can not be used when making a shared object;
+recompile with -fPIC （这里提示重新编译with -fPIC<重新编译zlib>）
+/usr/local/lib/libz.a: could not read symbols: Bad value
+这种情况一般为64位系统出现，可以重新编译zlib，使用64位元编译方法：
+cd zlib-1.2.3
+CFLAGS="-O3 -fPIC" ./configure
+make
+make install
+make clean
+用源代码编译安装其他一些软件时如果出现类似的错误也可以用这种方法解决；
